@@ -26,6 +26,8 @@ open class PieChartRenderer: NSObject, DataRenderer
     public let animator: Animator
 
     @objc open weak var chart: PieChartView?
+    
+    var highlightedIndex: Int?
 
     @objc public init(chart: PieChartView, animator: Animator, viewPortHandler: ViewPortHandler)
     {
@@ -374,7 +376,6 @@ open class PieChartRenderer: NSObject, DataRenderer
                 let sliceAngle = drawAngles[xIndex]
                 let sliceSpace = getSliceSpace(dataSet: dataSet)
                 let sliceSpaceMiddleAngle = sliceSpace / labelRadius.DEG2RAD
-
                 // offset needed to center the drawn text in the slice
                 let angleOffset = (sliceAngle - sliceSpaceMiddleAngle / 2.0) / 2.0
 
@@ -445,7 +446,7 @@ open class PieChartRenderer: NSObject, DataRenderer
                         align = .left
                         labelPoint = CGPoint(x: pt2.x + 5, y: pt2.y - lineHeight)
                     }
-
+                    if j == highlightedIndex {
                     DrawLine: do
                     {
                         if dataSet.useValueColorForLine
@@ -465,52 +466,59 @@ open class PieChartRenderer: NSObject, DataRenderer
                         context.move(to: CGPoint(x: pt0.x, y: pt0.y))
                         context.addLine(to: CGPoint(x: pt1.x, y: pt1.y))
                         context.addLine(to: CGPoint(x: pt2.x, y: pt2.y))
-
-                        context.drawPath(using: CGPathDrawingMode.stroke)
-                    }
-                    
-                    if drawXOutside && drawYOutside
-                    {
-                        context.drawText(valueText,
-                                         at: labelPoint,
-                                         align: align,
-                                         angleRadians: angleRadians,
-                                         attributes: [.font: valueFont,
-                                                      .foregroundColor: valueTextColor])
+                        context.addEllipse(in: CGRect(x: pt2.x - 2.5, y: pt2.y - 2.5, width: 5, height: 5))
+                        context.setFillColor(dataSet.color(atIndex: j).cgColor)
                         
-                        if j < data.entryCount && pe?.label != nil
+                        context.drawPath(using: CGPathDrawingMode.stroke)
+                        
+                        context.fillEllipse(in: CGRect(x: pt2.x - 2.5, y: pt2.y - 2.5, width: 5, height: 5))
+
+                    }
+                        
+                        
+                        if drawXOutside && drawYOutside
                         {
-                            context.drawText(pe!.label!,
-                                             at: CGPoint(x: labelPoint.x,
-                                                         y: labelPoint.y + lineHeight),
+                            context.drawText(valueText,
+                                             at: labelPoint,
                                              align: align,
                                              angleRadians: angleRadians,
-                                             attributes: [.font: entryLabelFont ?? valueFont,
-                                                          .foregroundColor: entryLabelColor ?? valueTextColor])
+                                             attributes: [.font: valueFont,
+                                                          .foregroundColor: valueTextColor])
+                            
+                            if j < data.entryCount && pe?.label != nil
+                            {
+                                context.drawText(pe!.label!,
+                                                 at: CGPoint(x: labelPoint.x,
+                                                             y: labelPoint.y + lineHeight),
+                                                 align: align,
+                                                 angleRadians: angleRadians,
+                                                 attributes: [.font: entryLabelFont ?? valueFont,
+                                                              .foregroundColor: entryLabelColor ?? valueTextColor])
+                            }
                         }
-                    }
-                    else if drawXOutside
-                    {
-                        if j < data.entryCount && pe?.label != nil
+                        else if drawXOutside
                         {
-                            context.drawText(pe!.label!,
+                            if j < data.entryCount && pe?.label != nil
+                            {
+                                context.drawText(pe!.label!,
+                                                 at: CGPoint(x: labelPoint.x,
+                                                             y: labelPoint.y + lineHeight / 2.0),
+                                                 align: align,
+                                                 angleRadians: angleRadians,
+                                                 attributes: [.font: entryLabelFont ?? valueFont,
+                                                              .foregroundColor: entryLabelColor ?? valueTextColor])
+                            }
+                        }
+                        else if drawYOutside
+                        {
+                            context.drawText(valueText,
                                              at: CGPoint(x: labelPoint.x,
                                                          y: labelPoint.y + lineHeight / 2.0),
                                              align: align,
                                              angleRadians: angleRadians,
-                                             attributes: [.font: entryLabelFont ?? valueFont,
-                                                          .foregroundColor: entryLabelColor ?? valueTextColor])
+                                             attributes: [.font: valueFont,
+                                                          .foregroundColor: valueTextColor])
                         }
-                    }
-                    else if drawYOutside
-                    {
-                        context.drawText(valueText,
-                                         at: CGPoint(x: labelPoint.x,
-                                                     y: labelPoint.y + lineHeight / 2.0),
-                                         align: align,
-                                         angleRadians: angleRadians,
-                                         attributes: [.font: valueFont,
-                                                      .foregroundColor: valueTextColor])
                     }
                 }
 
@@ -726,6 +734,8 @@ open class PieChartRenderer: NSObject, DataRenderer
         {
             // get the index to highlight
             let index = Int(hightlight.x)
+            self.highlightedIndex = index
+            print("drawHighlighted(): highlighted index: \(index)")
             guard index < drawAngles.count,
                   let set = data[hightlight.dataSetIndex] as? PieChartDataSetProtocol,
                   set.isHighlightEnabled
@@ -754,7 +764,7 @@ open class PieChartRenderer: NSObject, DataRenderer
                 angle = absoluteAngles[index - 1] * CGFloat(phaseX)
             }
 
-            let sliceSpace = visibleAngleCount <= 1 ? 0.0 : set.sliceSpace
+            let sliceSpace = 15.0//visibleAngleCount <= 1 ? 0.0 : set.sliceSpace
 
             let sliceAngle = drawAngles[index]
             var innerRadius = userInnerRadius
