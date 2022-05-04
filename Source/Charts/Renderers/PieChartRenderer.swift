@@ -388,7 +388,7 @@ open class PieChartRenderer: NSObject, DataRenderer
                     value,
                     entry: e,
                     dataSetIndex: i,
-                    viewPortHandler: viewPortHandler)
+                    viewPortHandler: viewPortHandler) + " %"
 
                 let sliceXBase = cos(transformedAngle.DEG2RAD)
                 let sliceYBase = sin(transformedAngle.DEG2RAD)
