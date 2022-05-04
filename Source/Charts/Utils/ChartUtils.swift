@@ -160,18 +160,21 @@ extension CGContext
     open func drawText(_ text: String, at point: CGPoint, align: TextAlignment, anchor: CGPoint = CGPoint(x: 0.5, y: 0.5), angleRadians: CGFloat = 0.0, attributes: [NSAttributedString.Key : Any]?)
     {
         let drawPoint = getDrawPoint(text: text, point: point, align: align, attributes: attributes)
-        
+        var newText = text
+        if text.count > 10 {
+            newText.insert(string: "\n", ind: text.count / 2)
+        }
         if (angleRadians == 0.0)
         {
             NSUIGraphicsPushContext(self)
-            
-            (text as NSString).draw(at: drawPoint, withAttributes: attributes)
+
+            (newText as NSString).draw(at: drawPoint, withAttributes: attributes)
             
             NSUIGraphicsPopContext()
         }
         else
         {
-            drawText(text, at: drawPoint, anchor: anchor, angleRadians: angleRadians, attributes: attributes)
+            drawText(newText, at: drawPoint, anchor: anchor, angleRadians: angleRadians, attributes: attributes)
         }
     }
     
@@ -295,4 +298,10 @@ extension CGContext
         let rect = text.boundingRect(with: size, options: .usesLineFragmentOrigin, attributes: attributes, context: nil)
         drawMultilineText(text, at: point, constrainedTo: size, anchor: anchor, knownTextSize: rect.size, angleRadians: angleRadians, attributes: attributes)
     }
+}
+
+extension String {
+  mutating func insert(string:String,ind:Int) {
+    self.insert(contentsOf: string, at:self.index(self.startIndex, offsetBy: ind) )
+  }
 }
