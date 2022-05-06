@@ -9,6 +9,7 @@
 //  https://github.com/danielgindi/Charts
 //
 
+import UIKit
 import Foundation
 import CoreGraphics
 
@@ -159,22 +160,26 @@ extension CGContext
 
     open func drawText(_ text: String, at point: CGPoint, align: TextAlignment, anchor: CGPoint = CGPoint(x: 0.5, y: 0.5), angleRadians: CGFloat = 0.0, attributes: [NSAttributedString.Key : Any]?)
     {
-        let drawPoint = getDrawPoint(text: text, point: point, align: align, attributes: attributes)
+        //let drawPoint = getDrawPoint(text: text, point: point, align: align, attributes: attributes)
         var newText = text
-        if text.count > 10 {
-            newText.insert(string: "\n", ind: text.count / 2)
-        }
+        let size = newText.sizeOfString(usingFont: UIFont.systemFont(ofSize: 10.0, weight: .medium))
+//        if text.count > 10 {
+//            newText.insert(string: "\n", ind: text.count / 2)
+        let rect = CGRect(x: point.x, y: point.y, width: size.width, height: size.height)
+//        }
         if (angleRadians == 0.0)
         {
             NSUIGraphicsPushContext(self)
 
-            (newText as NSString).draw(at: drawPoint, withAttributes: attributes)
+            //(newText as NSString).draw(at: drawPoint, withAttributes: attributes)
+            (newText as NSString).draw(in: rect, withAttributes: attributes)
             
             NSUIGraphicsPopContext()
         }
         else
         {
-            drawText(newText, at: drawPoint, anchor: anchor, angleRadians: angleRadians, attributes: attributes)
+            //drawText(newText, at: point, anchor: anchor, angleRadians: angleRadians, attributes: attributes)
+            drawMultilineText(newText, at: point, constrainedTo: size, anchor: anchor, angleRadians: angleRadians, attributes: attributes)
         }
     }
     
@@ -206,8 +211,9 @@ extension CGContext
             saveGState()
             translateBy(x: translate.x, y: translate.y)
             rotate(by: angleRadians)
-
-            (text as NSString).draw(at: drawOffset, withAttributes: attributes)
+            let itemsize = text.sizeOfString(usingFont: UIFont.systemFont(ofSize: 10.0, weight: .medium))
+            let rect = CGRect(x: drawOffset.x, y: drawOffset.y, width: itemsize.width, height: itemsize.height)
+            (text as NSString).draw(in: rect, withAttributes: attributes)//draw(at: drawOffset, withAttributes: attributes)
 
             restoreGState()
         }
@@ -223,8 +229,9 @@ extension CGContext
 
             drawOffset.x += point.x
             drawOffset.y += point.y
-
-            (text as NSString).draw(at: drawOffset, withAttributes: attributes)
+            let itemsize = text.sizeOfString(usingFont: UIFont.systemFont(ofSize: 10.0, weight: .medium))
+            let rect = CGRect(x: drawOffset.x, y: drawOffset.y, width: itemsize.width, height: itemsize.height)
+            (text as NSString).draw(in: rect, withAttributes: attributes)//.draw(at: drawOffset, withAttributes: attributes)
         }
 
         NSUIGraphicsPopContext()
@@ -234,7 +241,7 @@ extension CGContext
     {
         var point = point
         
-        if align == .center
+        if align == .left
         {
             point.x -= text.size(withAttributes: attributes).width / 2.0
         }
@@ -304,4 +311,24 @@ extension String {
   mutating func insert(string:String,ind:Int) {
     self.insert(contentsOf: string, at:self.index(self.startIndex, offsetBy: ind) )
   }
+}
+
+extension String {
+
+    func widthOfString(usingFont font: UIFont) -> CGFloat {
+        let fontAttributes = [NSAttributedString.Key.font: font]
+        let size = self.size(withAttributes: fontAttributes)
+        return size.width
+    }
+
+    func heightOfString(usingFont font: UIFont) -> CGFloat {
+        let fontAttributes = [NSAttributedString.Key.font: font]
+        let size = self.size(withAttributes: fontAttributes)
+        return size.height
+    }
+
+    func sizeOfString(usingFont font: UIFont) -> CGSize {
+        let fontAttributes = [NSAttributedString.Key.font: font]
+        return self.size(withAttributes: fontAttributes)
+    }
 }
