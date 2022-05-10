@@ -172,8 +172,8 @@ extension CGContext
             NSUIGraphicsPushContext(self)
 
             //(newText as NSString).draw(at: drawPoint, withAttributes: attributes)
-            //(newText as NSString).draw(in: rect, withAttributes: attributes)
-            drawMultilineText(newText, at: point, constrainedTo: size, anchor: anchor, angleRadians: 0.0, attributes: attributes)
+            (newText as NSString).draw(in: rect, withAttributes: attributes)
+            
             NSUIGraphicsPopContext()
         }
         else
@@ -213,8 +213,8 @@ extension CGContext
             rotate(by: angleRadians)
             let itemsize = text.sizeOfString(usingFont: UIFont.systemFont(ofSize: 10.0, weight: .medium))
             let rect = CGRect(x: drawOffset.x, y: drawOffset.y, width: itemsize.width, height: itemsize.height)
-            //(text as NSString).draw(in: rect, withAttributes: attributes)//draw(at: drawOffset, withAttributes: attributes)
-            drawMultilineText(text, at: point, constrainedTo: size, anchor: anchor, angleRadians: angleRadians, attributes: attributes)
+            (text as NSString).draw(in: rect, withAttributes: attributes)//draw(at: drawOffset, withAttributes: attributes)
+
             restoreGState()
         }
         else
@@ -226,13 +226,12 @@ extension CGContext
                 drawOffset.x = -size.width * anchor.x
                 drawOffset.y = -size.height * anchor.y
             }
-            let size = text.size(withAttributes: attributes)
+
             drawOffset.x += point.x
             drawOffset.y += point.y
             let itemsize = text.sizeOfString(usingFont: UIFont.systemFont(ofSize: 10.0, weight: .medium))
             let rect = CGRect(x: drawOffset.x, y: drawOffset.y, width: itemsize.width, height: itemsize.height)
-            //(text as NSString).draw(in: rect, withAttributes: attributes)//.draw(at: drawOffset, withAttributes: attributes)
-            drawMultilineText(text, at: point, constrainedTo: size, anchor: anchor, angleRadians: angleRadians, attributes: attributes)
+            (text as NSString).draw(in: rect, withAttributes: attributes)//.draw(at: drawOffset, withAttributes: attributes)
         }
 
         NSUIGraphicsPopContext()
