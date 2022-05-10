@@ -437,8 +437,8 @@ open class PieChartRenderer: NSObject, DataRenderer
                     if transformedAngle.truncatingRemainder(dividingBy: 360.0) >= 90.0 && transformedAngle.truncatingRemainder(dividingBy: 360.0) <= 270.0
                     {
                         pt2 = CGPoint(x: pt1.x - polyline2Length, y: pt1.y)
-                        align = .right
-                        labelPoint = CGPoint(x: pt2.x - 5, y: pt2.y - lineHeight)
+                        align = .center
+                        labelPoint = CGPoint(x: pt2.x - 55.0, y: pt2.y - lineHeight)
                     }
                     else
                     {

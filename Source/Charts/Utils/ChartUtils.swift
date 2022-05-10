@@ -162,7 +162,7 @@ extension CGContext
     {
         //let drawPoint = getDrawPoint(text: text, point: point, align: align, attributes: attributes)
         var newText = text
-        let size = newText.sizeOfString(usingFont: UIFont.systemFont(ofSize: 10.0, weight: .medium))
+        let size = CGSize(width: 70.0, height: 70.0)//newText.sizeOfString(usingFont: UIFont.systemFont(ofSize: 10.0, weight: .medium))
 //        if text.count > 10 {
 //            newText.insert(string: "\n", ind: text.count / 2)
         let rect = CGRect(x: point.x, y: point.y, width: size.width, height: size.height)
@@ -191,8 +191,8 @@ extension CGContext
 
         if angleRadians != 0.0
         {
-            let size = text.size(withAttributes: attributes)
-
+            //let size = text.size(withAttributes: attributes)
+            let size = CGSize(width: 70.0, height: 70.0)
             // Move the text drawing rect in a way that it always rotates around its center
             drawOffset.x = -size.width * 0.5
             drawOffset.y = -size.height * 0.5
